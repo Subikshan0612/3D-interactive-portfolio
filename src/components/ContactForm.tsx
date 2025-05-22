@@ -18,49 +18,145 @@ const ContactForm = () => {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          message,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch("/api/send", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         fullName,
+  //         email,
+  //         message,
+  //       }),
+  //     });
+  //     const data = await res.json();
+  //     if (data.error) throw new Error(data.error);
+  //     toast({
+  //       title: "Thank you!",
+  //       description: "I'll get back to you as soon as possible.",
+  //       variant: "default",
+  //       className: cn("top-0 mx-auto flex fixed md:top-4 md:right-4"),
+  //     });
+  //     setLoading(false);
+  //     setFullName("");
+  //     setEmail("");
+  //     setMessage("");
+  //     const timer = setTimeout(() => {
+  //       router.push("/");
+  //       clearTimeout(timer);
+  //     }, 1000);
+  //   } catch (err) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Something went wrong! Please check the fields.",
+  //       className: cn(
+  //         "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
+  //       ),
+  //       variant: "destructive",
+  //     });
+  //   }
+  //   setLoading(false);
+  // };
+  
+  // In the handleSubmit function, update the success/error handling:
+
+// const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//   setLoading(true);
+//   try {
+//     const res = await fetch("/api/send", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         fullName,
+//         email,
+//         message,
+//       }),
+//     });
+//     const data = await res.json();
+    
+//     if (!data.success) throw new Error(data.message || "Something went wrong");
+    
+//     toast({
+//       title: "Thank you!",
+//       description: "I'll get back to you as soon as possible.",
+//       variant: "default",
+//       className: cn("top-0 mx-auto flex fixed md:top-4 md:right-4"),
+//     });
+//     setLoading(false);
+//     setFullName("");
+//     setEmail("");
+//     setMessage("");
+//     const timer = setTimeout(() => {
+//       router.push("/");
+//       clearTimeout(timer);
+//     }, 1000);
+//   } catch (err: any) {
+//     toast({
+//       title: "Error",
+//       description: err.message || "Something went wrong! Please check the fields.",
+//       className: cn(
+//         "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
+//       ),
+//       variant: "destructive",
+//     });
+//   }
+//   setLoading(false);
+// };
+
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    const formData = new FormData();
+    formData.append('access_key', '98bf8161-7182-4340-afd8-3bab361e393b'); // Replace with your actual key
+    formData.append('name', fullName);
+    formData.append('email', email);
+    formData.append('message', message);
+    formData.append('subject', 'New Contact Form Submission');
+    
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
       toast({
         title: "Thank you!",
         description: "I'll get back to you as soon as possible.",
         variant: "default",
         className: cn("top-0 mx-auto flex fixed md:top-4 md:right-4"),
       });
-      setLoading(false);
       setFullName("");
       setEmail("");
       setMessage("");
-      const timer = setTimeout(() => {
-        router.push("/");
-        clearTimeout(timer);
-      }, 1000);
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Something went wrong! Please check the fields.",
-        className: cn(
-          "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
-        ),
-        variant: "destructive",
-      });
+    } else {
+      throw new Error(data.message || "Something went wrong");
     }
-    setLoading(false);
-  };
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err.message || "Something went wrong! Please check the fields.",
+      className: cn(
+        "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
+      ),
+      variant: "destructive",
+    });
+  }
+  
+  setLoading(false);
+};
+
+  
   return (
     <form className="min-w-7xl mx-auto sm:mt-4" onSubmit={handleSubmit}>
       <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
